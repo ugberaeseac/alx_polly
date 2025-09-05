@@ -3,6 +3,8 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { signIn } from '@/lib/auth-actions';
+
 
 const LoginPage = () => {
   return (
@@ -14,7 +16,7 @@ const LoginPage = () => {
       </div>
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form className="space-y-6" action="#" method="POST">
+        <form className="space-y-6" action={signIn}>
           <div>
             <Label htmlFor="email">Email address</Label>
             <div className="mt-2">
