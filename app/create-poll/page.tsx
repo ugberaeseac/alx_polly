@@ -1,4 +1,4 @@
-import { createPoll } from '@/lib/actions';
+import { createPollData } from '@/lib/data/polls';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -7,7 +7,7 @@ export default function CreatePollPage() {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-6">Create New Poll</h1>
-      <form action={createPoll} className="space-y-4">
+      <form action={createPollData} className="space-y-4">
         <div>
           <Label htmlFor="title">Poll Title</Label>
           <Input id="title" name="title" required />

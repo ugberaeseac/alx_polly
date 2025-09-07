@@ -1,6 +1,6 @@
-import { createServerSupabaseClient } from '@/lib/supabase/server-client';
+import { createServerSupabaseClient } from '@/app/utils/supabase/server';
 import { notFound, redirect } from 'next/navigation';
-import { editPoll } from '@/lib/actions';
+import { editPollData, getPollById } from '@/lib/data/polls';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -35,7 +35,7 @@ export default async function EditPollPage({ params }: EditPollPageProps) {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-6">Edit Poll</h1>
-      <form action={editPoll} className="space-y-4">
+      <form action={editPollData} className="space-y-4">
         <input type="hidden" name="pollId" value={poll.id} />
         <div>
           <Label htmlFor="title">Poll Title</Label>

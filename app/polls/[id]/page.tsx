@@ -1,5 +1,4 @@
-import { createServerSupabaseClient } from '@/lib/supabase/server-client';
-import { notFound, redirect } from 'next/navigation';
+import { getPollById, getUserVote } from '@/lib/data/polls';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -8,29 +7,23 @@ import { submitVoteAction } from '@/lib/actions';
 import LoginPrompt from '@/components/LoginPrompt';
 
 export default async function PollDetails({ params }: { params: { id: string } }) {
-  const supabase = createServerSupabaseClient();
-  const { data: userData, error: userError } = await supabase.auth.getUser();
 
-  const isAuthenticated = !!userData.user;
 
-  const { data: poll, error } = await supabase
-    .from('polls')
-    .select('*, options(*), total_votes, likes')
-    .eq('id', params.id)
-    .single();
+  const { data: poll, error } = await getPollById(params.id);
 
   if (error || !poll) {
     notFound();
   }
 
-  // Check if the user has already voted
-  const { data: userVote, error: voteError } = await supabase
-    .from('votes')
-    .select('option_id')
-    .eq('poll_id', params.id)
-    .eq('user_id', userData.user.id)
-    .single();
 
+
+
+  // Check if the user has already voted
+  const supabase = createServerSupabaseClient();
+  const { data: userData } = await supabase.auth.getUser();
+  const user = userData.user;
+  const isAuthenticated = !!user;
+  const userVote = user ? await getUserVote(params.id, user.id) : null;
   const hasVoted = !!userVote;
 
   return (

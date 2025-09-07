@@ -4,7 +4,7 @@ import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
-import { deletePollAction } from '@/lib/actions';
+import { deletePollActionData } from '@/lib/data/polls';
 import Link from 'next/link';
 
 interface PollCardProps {
@@ -14,18 +14,15 @@ interface PollCardProps {
     description: string | null;
     created_by: string;
   };
-  user: {
-    id: string;
-  } | null;
 }
 
-export default function PollCard({ poll, user }: PollCardProps) {
+export default function PollCard({ poll }: PollCardProps) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
   const handleDelete = () => {
     startTransition(async () => {
-      await deletePollAction(new FormData()); // Empty form data for now, actual pollId will be passed via hidden input
+      await deletePollActionData(new FormData()); // Empty form data for now, actual pollId will be passed via hidden input
       router.refresh();
     });
   };
@@ -53,7 +50,7 @@ export default function PollCard({ poll, user }: PollCardProps) {
               e.preventDefault();
               startTransition(async () => {
                 const formData = new FormData(e.currentTarget);
-                await deletePollAction(formData);
+                await deletePollActionData(formData);
                 router.refresh();
               });
             }}>

@@ -1,20 +1,16 @@
 import React from 'react';
 import { createServerSupabaseClient } from '@/app/utils/supabase/server';
+import { getPollsByUserId } from '@/lib/data/polls';
 import { redirect } from 'next/navigation';
 
 export default async function PollsPage() {
-  const supabase = createServerSupabaseClient();
-
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: user } = await supabase.auth.getUser();
 
   if (!user) {
     redirect('/auth/login');
   }
 
-  const { data: polls, error } = await supabase
-    .from('polls')
-    .select('*')
-    .eq('user_id', user.id);
+  const { data: polls, error } = await getPollsByUserId(user.id);
 
   if (error) {
     console.error('Error fetching polls:', error.message);
