@@ -20,7 +20,7 @@ export async function signUp(formData: FormData) {
 
   if (error) {
     console.error('Error signing up:', error);
-    return redirect('/auth/register?message=Could not authenticate user');
+    return redirect('/auth/signup?message=Could not authenticate user');
   }
 
   return redirect('/auth/login?message=Check email to verify account');

@@ -1,3 +1,4 @@
+import React from 'react';
 import { createServerSupabaseClient } from '@/app/utils/supabase/server';
 import { redirect } from 'next/navigation';
 
