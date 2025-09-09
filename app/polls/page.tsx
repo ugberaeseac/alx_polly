@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 
 export default async function PollsPage() {
   const supabase = await createServerSupabaseClient();
-  const { data: { user } } = awai supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
 
   console.log('User object in PollsPage:', user);
 
