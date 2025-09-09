@@ -5,6 +5,10 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 export async function getPollsByUserId(userId: string) {
+  if (!userId) {
+    console.error('getPollsByUserId: userId is undefined or null');
+    return { data: [], error: new Error('User ID is required') };
+  }
   const supabase = await createServerSupabaseClient();
   const { data: polls, error } = await supabase
     .from('polls')
@@ -13,9 +17,9 @@ export async function getPollsByUserId(userId: string) {
 
   if (error) {
     console.error('Error fetching polls by user ID:', error);
-    return [];
+    return { data: [], error };
   }
-  return polls;
+  return { data: polls, error: null };
 }
 
 export async function getAllPolls() {
