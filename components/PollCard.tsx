@@ -6,33 +6,28 @@ import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { deletePollActionData } from '@/lib/data/polls';
 import Link from 'next/link';
+import { createClientSupabaseClient } from '@/app/utils/supabase/client';
 
 interface PollCardProps {
   poll: {
     id: string;
-    title: string; // Changed from question to title
+    title: string;
     description: string | null;
     created_by: string;
   };
+  user: any;
 }
 
-export default function PollCard({ poll }: PollCardProps) {
+export default function PollCard({ poll, user }: PollCardProps) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
-
-  const handleDelete = () => {
-    startTransition(async () => {
-      await deletePollActionData(new FormData()); // Empty form data for now, actual pollId will be passed via hidden input
-      router.refresh();
-    });
-  };
 
   return (
     <Card className="flex flex-col">
       <CardHeader>
         <CardTitle>
           <Link href={`/polls/${poll.id}`} className="hover:underline">
-            {poll.question}
+            {poll.title}
           </Link>
         </CardTitle>
         {poll.description && (

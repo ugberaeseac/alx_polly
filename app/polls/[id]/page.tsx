@@ -1,3 +1,4 @@
+import { notFound } from 'next/navigation';
 import { getPollById, getUserVote } from '@/lib/data/polls';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
@@ -5,11 +6,11 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { submitVoteAction } from '@/lib/actions';
 import LoginPrompt from '@/components/LoginPrompt';
+import { createServerSupabaseClient } from '@/app/utils/supabase/server';
 
-export default async function PollDetails({ params }: { params: { id: string } }) {
-
-
-  const { data: poll, error } = await getPollById(params.id);
+export default async function PollDetails({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const { data: poll, error } = await getPollById(id);
 
   if (error || !poll) {
     notFound();

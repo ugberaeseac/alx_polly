@@ -1,12 +1,14 @@
-import { getAllPolls, deletePollActionData } from '@/lib/data/polls';
-import { Button } from '@/components/ui/button';
+import { getAllPolls } from '@/lib/data/polls';
 import PollCard from '@/components/PollCard';
+import { createServerSupabaseClient } from '@/app/utils/supabase/server';
 
 export default async function HomePage() {
-  const { data: polls, error } = await getAllPolls();
+  const supabase = await createServerSupabaseClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  const polls = await getAllPolls();
 
-  if (error) {
-    console.error('Error fetching polls:', error.message);
+  if (!polls) {
     return <div>Error loading polls.</div>;
   }
 
@@ -14,12 +16,12 @@ export default async function HomePage() {
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-6">All Polls</h1>
       {
-        polls?.length === 0 ? (
+        polls.length === 0 ? (
           <p>No polls available yet.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {polls?.map((poll) => (
-              <PollCard key={poll.id} poll={{ ...poll, title: poll.question }} />
+            {polls.map((poll) => (
+              <PollCard key={poll.id} poll={poll} user={user} />
             ))}
           </div>
         )

@@ -1,9 +1,11 @@
+'use server';
+
 import { createServerSupabaseClient } from '@/app/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 export async function getPollsByUserId(userId: string) {
-  const supabase = createServerSupabaseClient();
+  const supabase = await createServerSupabaseClient();
   const { data: polls, error } = await supabase
     .from('polls')
     .select('*')
@@ -17,7 +19,7 @@ export async function getPollsByUserId(userId: string) {
 }
 
 export async function getAllPolls() {
-  const supabase = createServerSupabaseClient();
+  const supabase = await createServerSupabaseClient();
   const { data: polls, error } = await supabase
     .from('polls')
     .select('*');
@@ -30,7 +32,7 @@ export async function getAllPolls() {
 }
 
 export async function getPollById(pollId: string) {
-  const supabase = createServerSupabaseClient();
+  const supabase = await createServerSupabaseClient();
   const { data: poll, error } = await supabase
     .from('polls')
     .select('*, options(*)')
@@ -45,7 +47,7 @@ export async function getPollById(pollId: string) {
 }
 
 export async function createPollData(formData: FormData) {
-  const supabase = createServerSupabaseClient();
+  const supabase = await createServerSupabaseClient();
 
   const title = formData.get('title') as string;
   const description = formData.get('description') as string;
@@ -218,48 +220,3 @@ export async function getUserVote(pollId: string, userId: string) {
   return userVote;
 }
 
-export async function editPollData(formData: FormData) {
-  const supabase = createServerSupabaseClient();
-  const userResponse = await supabase.auth.getUser();
-  const user = userResponse.data.user;
-
-  if (!user) {
-    throw new Error('User not authenticated');
-  }
-
-  const pollId = formData.get('pollId') as string;
-  const question = formData.get('question') as string;
-  const description = formData.get('description') as string;
-
-  const { error } = await supabase
-    .from('polls')
-    .update({ question, description })
-    .eq('id', pollId)
-    .eq('user_id', user.id);
-
-  if (error) {
-    console.error('Error updating poll:', error.message);
-    throw new Error('Failed to update poll.');
-  }
-}
-
-export async function deletePollData(pollId: string) {
-  const supabase = createServerSupabaseClient();
-  const userResponse = await supabase.auth.getUser();
-  const user = userResponse.data.user;
-
-  if (!user) {
-    throw new Error('User not authenticated');
-  }
-
-  const { error } = await supabase
-    .from('polls')
-    .delete()
-    .eq('id', pollId)
-    .eq('user_id', user.id);
-
-  if (error) {
-    console.error('Error deleting poll:', error.message);
-    throw new Error('Failed to delete poll.');
-  }
-}

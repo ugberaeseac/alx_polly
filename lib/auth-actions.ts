@@ -1,6 +1,6 @@
 'use server';
 
-import { createServerSupabaseClient } from './supabase/server-client';
+import { createServerSupabaseClient } from '@/app/utils/supabase/server';
 
 
 import { redirect } from 'next/navigation';
@@ -8,7 +8,7 @@ import { redirect } from 'next/navigation';
 export async function signUp(formData: FormData) {
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
-  const supabase = createServerSupabaseClient();
+  const supabase = await createServerSupabaseClient();
 
   const { error } = await supabase.auth.signUp({
     email,
@@ -29,7 +29,7 @@ export async function signUp(formData: FormData) {
 export async function signIn(formData: FormData) {
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
-  const supabase = createServerSupabaseClient();
+  const supabase = await createServerSupabaseClient();
 
   const { error } = await supabase.auth.signInWithPassword({
     email,
@@ -38,14 +38,14 @@ export async function signIn(formData: FormData) {
 
   if (error) {
     console.error('Error signing in:', error);
-    return redirect('/auth/login?message=Could not authenticate user');
+    return redirect('/auth/login?message=' + error.message);
   }
 
   return redirect('/polls');
 }
 
 export async function signOut() {
-  const supabase = createServerSupabaseClient();
+  const supabase = await createServerSupabaseClient();
   const { error } = await supabase.auth.signOut();
 
   if (error) {

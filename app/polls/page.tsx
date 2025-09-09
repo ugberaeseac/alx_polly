@@ -4,6 +4,7 @@ import { getPollsByUserId } from '@/lib/data/polls';
 import { redirect } from 'next/navigation';
 
 export default async function PollsPage() {
+  const supabase = await createServerSupabaseClient();
   const { data: user } = await supabase.auth.getUser();
 
   if (!user) {
