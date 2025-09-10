@@ -129,4 +129,5 @@ reviews:
       - cognitive_complexity
       - maintainability_index
       - code_duplication
+
       - test_coverage
