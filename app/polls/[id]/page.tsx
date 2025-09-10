@@ -59,7 +59,7 @@ export default async function PollDetails({ params }: { params: Promise<{ id: st
       <Separator className="my-8" />
 
       <div className="text-center mt-4">
-        <p className="text-sm text-gray-500">Created by: {poll.created_by}</p>
+        <p className="text-sm text-gray-500">Created by: {poll.user_id}</p>
         <p className="text-sm text-gray-500">Created at: {new Date(poll.created_at).toLocaleString()}</p>
       </div>
     </div>

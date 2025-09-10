@@ -5,10 +5,13 @@ import { redirect } from 'next/navigation';
 
 export default async function PollsPage() {
   const supabase = await createServerSupabaseClient();
-  const { data: user } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user) {
+  console.log('User object in PollsPage:', user);
+
+  if (!user || !user.id) {
     redirect('/auth/login');
+    return;
   }
 
   const { data: polls, error } = await getPollsByUserId(user.id);

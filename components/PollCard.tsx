@@ -13,7 +13,7 @@ interface PollCardProps {
     id: string;
     title: string;
     description: string | null;
-    created_by: string;
+    user_id: string;
   };
   user: any;
 }
@@ -38,7 +38,7 @@ export default function PollCard({ poll, user }: PollCardProps) {
       </CardHeader>
       <CardContent className="grow"></CardContent>
       <CardFooter className="flex justify-between">
-        {user && user.id === poll.created_by && (
+        {user && user.id === poll.user_id && (
           <div className="flex space-x-2">
             <Button onClick={() => router.push(`/polls/${poll.id}/edit`)} variant="outline">Edit</Button>
             <form onSubmit={(e) => {

@@ -4,7 +4,15 @@ import { createServerSupabaseClient } from '@/app/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
-export async function getPollsByUserId(userId: string) {
+import { Database } from '@/lib/supabase/database.types';
+
+type Poll = Database['public']['Tables']['polls']['Row'];
+
+export async function getPollsByUserId(userId: string): Promise<{ data: Poll[]; error: Error | null }> {
+  if (!userId) {
+    console.error('getPollsByUserId: userId is undefined or null');
+    return { data: [], error: new Error('User ID is required') };
+  }
   const supabase = await createServerSupabaseClient();
   const { data: polls, error } = await supabase
     .from('polls')
@@ -13,12 +21,12 @@ export async function getPollsByUserId(userId: string) {
 
   if (error) {
     console.error('Error fetching polls by user ID:', error);
-    return [];
+    return { data: [], error };
   }
-  return polls;
+  return { data: polls, error: null };
 }
 
-export async function getAllPolls() {
+export async function getAllPolls(): Promise<{ data: Poll[]; error: Error | null }> {
   const supabase = await createServerSupabaseClient();
   const { data: polls, error } = await supabase
     .from('polls')
@@ -26,12 +34,12 @@ export async function getAllPolls() {
 
   if (error) {
     console.error('Error fetching all polls:', error);
-    return [];
+    return { data: [], error };
   }
-  return polls;
+  return { data: polls, error: null };
 }
 
-export async function getPollById(pollId: string) {
+export async function getPollById(pollId: string): Promise<{ data: Poll | null; error: Error | null }> {
   const supabase = await createServerSupabaseClient();
   const { data: poll, error } = await supabase
     .from('polls')
@@ -41,9 +49,9 @@ export async function getPollById(pollId: string) {
 
   if (error) {
     console.error('Error fetching poll by ID:', error);
-    return null;
+    return { data: null, error };
   }
-  return poll;
+  return { data: poll, error: null };
 }
 
 export async function createPollData(formData: FormData) {
@@ -90,7 +98,7 @@ export async function createPollData(formData: FormData) {
   redirect('/');
 }
 
-export async function editPollData(formData: FormData) {
+export async function editPollData(formData: FormData): Promise<{ data: Poll | null; error: Error | null }> {
   const supabase = createServerSupabaseClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -102,15 +110,17 @@ export async function editPollData(formData: FormData) {
   const title = formData.get('title') as string;
   const description = formData.get('description') as string | null;
 
-  const { error: pollError } = await supabase
+  const { data: poll, error: pollError } = await supabase
     .from('polls')
     .update({ title, description, updated_at: new Date().toISOString() })
     .eq('id', pollId)
-    .eq('created_by', user.id);
+    .eq('user_id', user.id)
+    .select()
+    .single();
 
   if (pollError) {
     console.error('Error updating poll:', pollError);
-    return { error: pollError.message };
+    return { data: null, error: new Error(pollError.message) };
   }
 
   // Update existing options and add new ones
@@ -156,15 +166,16 @@ export async function editPollData(formData: FormData) {
 
     if (optionsInsertError) {
       console.error('Error inserting new options:', optionsInsertError);
-      return { error: optionsInsertError.message };
+      return { data: null, error: new Error(optionsInsertError.message) };
     }
   }
 
   revalidatePath('/');
   redirect('/');
+  return { data: poll, error: null };
 }
 
-export async function deletePollData(pollId: string) {
+export async function deletePollData(pollId: string): Promise<{ data: null; error: Error | null }> {
   const supabase = createServerSupabaseClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -180,7 +191,7 @@ export async function deletePollData(pollId: string) {
 
   if (optionsError) {
     console.error('Error deleting options:', optionsError);
-    return { error: optionsError.message };
+    return { data: null, error: new Error(optionsError.message) };
   }
 
   // Then delete the poll
@@ -188,15 +199,16 @@ export async function deletePollData(pollId: string) {
     .from('polls')
     .delete()
     .eq('id', pollId)
-    .eq('created_by', user.id);
+    .eq('user_id', user.id);
 
   if (pollError) {
     console.error('Error deleting poll:', pollError);
-    return { error: pollError.message };
+    return { data: null, error: new Error(pollError.message) };
   }
 
   revalidatePath('/');
   redirect('/');
+  return { data: null, error: null };
 }
 
 export async function deletePollActionData(formData: FormData) {
